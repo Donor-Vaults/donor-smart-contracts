@@ -25,10 +25,17 @@ contract Campaigns {
 
     uint256 public totalFee = 30;// 3%
 
-    uint256 public teamFee = 50;
+    uint256 public teamFee = 15;
     uint256 public burnFee = 75;
     uint256 public rewardFee = 25;
 
+// total amount = 100
+    // fee is = 100*3/100 = 3
+    // teamFee is =3/2 = 1.5 // 50%
+    //burnFee is = 1.5*75/100 = 1.125
+    // rewardFee is = 1.5*25/100 =  0.375
+
+    
     uint256 public totalRaised;
     uint256 public totalPaid;
 
@@ -69,13 +76,14 @@ contract Campaigns {
         totalPaid +=amount;
 
         uint256 totalFeeAmount = amount*totalFee/1000;
-        uint256 burnFeeAmount = totalFeeAmount*burnFee/1000;
-        uint256 rewardFeeAmount = totalFeeAmount*rewardFee/1000;
-        uint256 teamFeeAmount = totalFeeAmount*teamFee/1000;
+        baseToken.safeTransfer(creator, amount-totalFeeAmount);
+        uint256 teamFeeAmount = totalFeeAmount/2;
+        uint256 burnFeeAmount = (totalFeeAmount/2)*75/100;
+        uint256 rewardFeeAmount = (totalFeeAmount/2)*25/100;
+        
         baseToken.safeTransfer(factory.burningWallet(), burnFeeAmount);
         baseToken.safeTransfer(factory.rewardWallet(), rewardFeeAmount);
         baseToken.safeTransfer(factory.teamWallet(), teamFeeAmount);
-        baseToken.safeTransfer(creator, amount-totalFeeAmount);
         emit onDisperse(amount);
     }
 
